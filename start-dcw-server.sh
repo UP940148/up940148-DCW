@@ -19,25 +19,21 @@ cd ../
 
 # Create clients
 gcloud config set compute/zone europe-west2-b
+
 n="${1:-1}"
-for i in `seq 1 "$n"`
-do
-  gcloud compute instances create \
-  --machine-type n2-highcpu-2 \
-  --tags http-server,https-server \
-  --metadata-from-file startup-script=client-startup.sh \
-  --metadata key="$secret",address="$IP" \
-  "client-$i"
-done
+gcloud compute instances create \
+--machine-type n2-highcpu-2 \
+--tags http-server,https-server \
+--metadata-from-file startup-script=client-startup.sh \
+--metadata key="$secret",address="$IP" \
+`seq -f "client-%g" 1 "$n"`
 
 # Start DCW as server
 cd distributed-controller-worker
 sudo npm run server "$secret"
 
 # Delete clients once process exits
-for i in `seq 1 "$n"`
-do
-  gcloud --quiet compute instances delete "client-$i"
-done
+gcloud --quiet compute instances delete \
+`seq -f "client-%g" 1 "$n"`
 
 gcloud --quiet compute instances delete dcw-server
