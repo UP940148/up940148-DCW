@@ -4,3 +4,5 @@ gcloud compute instances create \
 --scopes cloud-platform \
 --tags http-server,https-server \
 dcw-server
+
+gcloud compute ssh dcw-server

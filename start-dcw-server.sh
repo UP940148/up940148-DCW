@@ -3,7 +3,7 @@
 # Install Node and Git
 curl -fsSL https://deb.nodesource.com/setup_17.x | sudo bash -
 sudo apt-get install -y nodejs
-sudo apt-get install git
+sudo apt-get install -y git
 
 # Install DCW
 sudo git clone https://github.com/portsoc/distributed-controller-worker
@@ -23,7 +23,7 @@ n="${1:-1}"
 for i in `seq 1 "$n"`
 do
   gcloud compute instances create \
-  --machine-type f1-micro \
+  --machine-type n2-highcpu-2 \
   --tags http-server,https-server \
   --metadata-from-file startup-script=client-startup.sh \
   --metadata key="$secret",address="$IP" \
@@ -33,3 +33,11 @@ done
 # Start DCW as server
 cd distributed-controller-worker
 sudo npm run server "$secret"
+
+# Delete clients once process exits
+for i in `seq 1 "$n"`
+do
+  gcloud --quiet compute instances delete "client-$i"
+done
+
+gcloud --quiet compute instances delete dcw-server
