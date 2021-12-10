@@ -17,7 +17,7 @@ cd distributed-controller-worker
 sudo npm install
 
 # Start DCW as client
-sudo npm run client "$key" "$address"
+sudo npm run client $key $address
 
 # Stop once DCW process complete
 sudo halt
